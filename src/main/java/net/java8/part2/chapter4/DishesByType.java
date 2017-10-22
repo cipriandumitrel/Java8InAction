@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.stream.Collectors.groupingBy;
+
 /**
  * Created by Ciprian on 2/7/2017.
  */
@@ -30,5 +32,10 @@ public class DishesByType {
         }
 
         System.out.println(dishesByType);
+
+        Map<Dish.Type, List<Dish>> dishesByType1 =
+                Dish.menu.stream().collect(groupingBy(Dish::getType));
+
+        System.out.println(dishesByType1);
     }
 }
