@@ -17,6 +17,7 @@ public class Grouping {
     public static void main(String[] args) {
         System.out.println("Dishes grouped by type: " + groupDishesByType());
         System.out.println("Dishes grouped by caloric level: " + groupDishesByCaloricLevel());
+        System.out.println("Dishes grouped by caloric level improved: " + groupDishesByCaloricLevelImproved());
         System.out.println("Dishes grouped by type and caloric level: " + groupDishedByTypeAndCaloricLevel());
         System.out.println("Dish names grouped by type: " + groupDishNamesByType());
         System.out.println("Count dishes in groups: " + countDishesInGroups());
@@ -69,6 +70,10 @@ public class Grouping {
                     CaloricLevel.NORMAL;
             else return CaloricLevel.FAT;
         }));
+    }
+
+    private static Map<CaloricLevel, List<Dish>> groupDishesByCaloricLevelImproved() {
+        return menu.stream().collect(groupingBy(Dish::getCaloricLevel));
     }
 
     private static Map<Dish.Type, List<Dish>> groupDishesByType() {
