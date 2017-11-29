@@ -15,11 +15,11 @@ public class ShopClient {
         Shop shop = new Shop("ABigShop");
 
         /* Synchronous call */
-        long start = System.nanoTime();
+        /*long start = System.nanoTime();
         double price = shop.getPrice(PRODUCT_NAME);
         long invocationTime = ((System.nanoTime() - start) / 1_000_000);
         System.out.println("Invocation returned the after " + invocationTime + " msecs");
-        System.out.printf("Price is %.2f%n ", price);
+        System.out.printf("Price is %.2f%n ", price);*/
 
         /* Asynchronous call */
         long asyncCallStart = System.nanoTime();

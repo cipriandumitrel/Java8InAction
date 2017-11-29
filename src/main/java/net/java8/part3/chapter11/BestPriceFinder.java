@@ -32,8 +32,9 @@ public class BestPriceFinder {
 
     public List<String> findPricesSequential(String product) {
         return shops.stream()
-                .map(shop -> String.format("%s price is %.2f",
-                        shop.getName(), shop.getPrice(product)))
+                .map(shop -> shop.getPrice(product))
+                .map(Quote::parse)
+                .map(Discount::applyDiscount)
                 .collect(toList());
     }
 
@@ -47,8 +48,12 @@ public class BestPriceFinder {
     public List<String> findPricesWithFutures(String product) {
         List<CompletableFuture<String>> priceFutures =
                 shops.stream()
-                        .map(shop -> CompletableFuture.supplyAsync(() -> String.format("%s price is %.2f",
-                                shop.getName(), shop.getPrice(product)), executor)).collect(toList());
+                        .map(shop -> CompletableFuture.supplyAsync(() -> shop.getPrice(product), executor))
+                        .map(future -> future.thenApply(Quote::parse))
+                        .map(future -> future.thenCompose(quote ->
+                                CompletableFuture.supplyAsync(
+                                        () -> Discount.applyDiscount(quote), executor)))
+                        .collect(toList());
 
         return priceFutures.stream().map(CompletableFuture::join).collect(toList());
     }
