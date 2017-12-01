@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
@@ -67,17 +68,16 @@ public class BestPriceFinder {
                                     CompletableFuture.supplyAsync(
                                             () -> ExchangeService.getRate(ExchangeService.Currency.EUR,
                                                     ExchangeService.Currency.USD)),
-                                    (price, rate) -> Double.valueOf(price) * rate
+                                    (price, rate) -> Quote.parse(shop.getPrice(product)).getPrice() * rate
                             );
             priceFutures.add(futurePriceInUSD);
         }
 
-        List<String> prices = priceFutures
+        return priceFutures
                 .stream()
                 .map(CompletableFuture::join)
                 .map(price -> " price is " + price)
                 .collect(Collectors.toList());
-        return prices;
     }
 
     public List<String> findPricesInUSDJava7(String product) {
@@ -92,7 +92,7 @@ public class BestPriceFinder {
 
             Future<Double> futurePriceInUSD = executorService.submit(() -> {
                 try {
-                    double priceInEUR = Double.valueOf(shop.getPrice(product));
+                    double priceInEUR = Quote.parse(shop.getPrice(product)).getPrice();
                     return priceInEUR * futureRate.get();
                 } catch (InterruptedException | ExecutionException e) {
                     throw new RuntimeException(e.getMessage(), e);
@@ -111,5 +111,23 @@ public class BestPriceFinder {
             }
         }
         return prices;
+    }
+
+    Stream<CompletableFuture<String>> findPricesStream(String product) {
+        return shops.stream()
+                .map(shop -> CompletableFuture.supplyAsync(() -> shop.getPrice(product), executor))
+                .map(future -> future.thenApply(Quote::parse))
+                .map(future -> future.thenCompose(quote -> CompletableFuture.supplyAsync(
+                        () -> Discount.applyDiscount(quote), executor)));
+    }
+
+    public void printPricesStream(String product) {
+        long start = System.nanoTime();
+        CompletableFuture[] futures = findPricesStream(product)
+                .map(future -> future.thenAccept((s -> System.out.println(s +
+                        " (done in " + ((System.nanoTime() - start) / 1_000_000) + " msecs)"))))
+                .toArray(size -> new CompletableFuture[size]);
+        CompletableFuture.allOf(futures).join();
+        System.out.println("All shops have now responded in " + ((System.nanoTime() - start) / 1_000_000) + " msecs");
     }
 }

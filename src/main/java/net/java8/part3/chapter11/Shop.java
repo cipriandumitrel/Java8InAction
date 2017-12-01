@@ -5,6 +5,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 import static net.java8.part3.chapter11.Util.delay;
+import static net.java8.part3.chapter11.Util.randomDelay;
 
 /**
  * Created by Ciprian on 11/26/2017.
@@ -28,7 +29,7 @@ public class Shop {
     }
 
     private double calculatePrice(String product) {
-        delay();
+        randomDelay();
         ///if(true) throw new RuntimeException("Product not available");
         return random.nextDouble() * product.charAt(0) + product.charAt(1);
     }

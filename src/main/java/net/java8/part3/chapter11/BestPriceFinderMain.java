@@ -12,7 +12,7 @@ public class BestPriceFinderMain {
 
     public static void main(String[] args) {
 
-        executeFindPriceOperation("sequential",
+        /*executeFindPriceOperation("sequential",
                 () -> bestPriceFinder.findPricesSequential("myPhone27S"));
 
         executeFindPriceOperation("parallel",
@@ -20,6 +20,11 @@ public class BestPriceFinderMain {
 
         executeFindPriceOperation("composed CompletableFuture",
                 () -> bestPriceFinder.findPricesWithFutures("myPhone27S"));
+
+        executeFindPriceOperation("combined USD CompletableFuture",
+                () -> bestPriceFinder.findPricesInUSD("myPhone27S"));*/
+
+        bestPriceFinder.printPricesStream("myPhone27S");
 
     }
 

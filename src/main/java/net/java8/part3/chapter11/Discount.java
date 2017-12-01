@@ -2,6 +2,7 @@ package net.java8.part3.chapter11;
 
 import static net.java8.part3.chapter11.Util.delay;
 import static net.java8.part3.chapter11.Util.format;
+import static net.java8.part3.chapter11.Util.randomDelay;
 
 /**
  * Created by ciprian on 11/29/17.
@@ -24,7 +25,7 @@ public class Discount {
     }
 
     private static double apply(double price, Code discountCode) {
-        delay();
+        randomDelay();
         return format(price * (100 - discountCode.percentage) / 100);
     }
 }

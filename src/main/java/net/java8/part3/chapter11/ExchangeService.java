@@ -1,6 +1,7 @@
 package net.java8.part3.chapter11;
 
 import static net.java8.part3.chapter11.Util.delay;
+import static net.java8.part3.chapter11.Util.randomDelay;
 
 /**
  * Created by Ciprian on 12/1/2017.
@@ -23,7 +24,7 @@ public class ExchangeService {
     }
 
     private static double getRateWithDelay(Currency from, Currency to) {
-        delay();
+        randomDelay();
         return to.rate / from.rate;
     }
 }
