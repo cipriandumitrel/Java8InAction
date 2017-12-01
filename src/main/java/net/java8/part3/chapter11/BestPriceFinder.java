@@ -1,11 +1,10 @@
 package net.java8.part3.chapter11;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -56,5 +55,61 @@ public class BestPriceFinder {
                         .collect(toList());
 
         return priceFutures.stream().map(CompletableFuture::join).collect(toList());
+    }
+
+    public List<String> findPricesInUSD(String product) {
+
+        List<CompletableFuture<Double>> priceFutures = new ArrayList<>();
+        for (Shop shop : shops) {
+            CompletableFuture<Double> futurePriceInUSD =
+                    CompletableFuture.supplyAsync(() -> shop.getPrice(product))
+                            .thenCombine(
+                                    CompletableFuture.supplyAsync(
+                                            () -> ExchangeService.getRate(ExchangeService.Currency.EUR,
+                                                    ExchangeService.Currency.USD)),
+                                    (price, rate) -> Double.valueOf(price) * rate
+                            );
+            priceFutures.add(futurePriceInUSD);
+        }
+
+        List<String> prices = priceFutures
+                .stream()
+                .map(CompletableFuture::join)
+                .map(price -> " price is " + price)
+                .collect(Collectors.toList());
+        return prices;
+    }
+
+    public List<String> findPricesInUSDJava7(String product) {
+        ExecutorService executorService = Executors.newCachedThreadPool();
+
+        List<Future<Double>> priceFutures = new ArrayList<>();
+
+        for (Shop shop : shops) {
+            final Future<Double> futureRate =
+                    executorService.submit(() ->
+                            ExchangeService.getRate(ExchangeService.Currency.EUR, ExchangeService.Currency.USD));
+
+            Future<Double> futurePriceInUSD = executorService.submit(() -> {
+                try {
+                    double priceInEUR = Double.valueOf(shop.getPrice(product));
+                    return priceInEUR * futureRate.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+            });
+
+            priceFutures.add(futurePriceInUSD);
+        }
+
+        List<String> prices = new ArrayList<>();
+        for (Future<Double> priceFuture : priceFutures) {
+            try {
+                prices.add(" price is " + priceFuture.get());
+            } catch (ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return prices;
     }
 }

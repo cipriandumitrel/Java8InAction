@@ -1,7 +1,6 @@
 package net.java8.part3.chapter11;
 
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Ciprian on 11/26/2017.
