@@ -2,6 +2,8 @@ package net.java8.part3.chapter12;
 
 import java.time.*;
 import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 
 /**
  * Created by Ciprian on 12/2/2017.
@@ -27,17 +29,44 @@ public class DateTimeExample {
 
         //Using java.time.Duration
         usageOfDurationAndPeriod();
+
+        //Manipulating dates
+        mutateDateObjects();
+
+        //Using TemporalAdjusters
+        useTemporalAdjusters();
+    }
+
+    private static void useTemporalAdjusters() {
+        LocalDate date1 = LocalDate.of(2017, 12, 3);
+        LocalDate date2 = date1.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
+        LocalDate date3 = date2.with(TemporalAdjusters.lastDayOfMonth());
+        System.out.println("Next sunday is: " + date2.getDayOfMonth() + "th of " + date2.getMonth());
+        System.out.println("The last day of " + date3.getMonth() + " is the " + date3.getDayOfMonth() + "st");
+    }
+
+    private static void mutateDateObjects() {
+        LocalDate date1 = LocalDate.of(2014, 3, 18);
+        LocalDate date2 = date1.withYear(2011);
+        LocalDate date3 = date2.withDayOfMonth(25);
+        LocalDate date4 = date3.with(ChronoField.MONTH_OF_YEAR, 9);
+        System.out.println("Mutated date: " + date4.getYear() + "-" + date4.getMonthValue() + "-" + date4.getDayOfMonth());
+
+        LocalDate date5 = date1.plusWeeks(1);
+        LocalDate date6 = date5.minusYears(3);
+        LocalDate date7 = date6.plus(6, ChronoUnit.MONTHS);
+        System.out.println("Mutated date v1: " + date7.getYear() + "-" + date7.getMonthValue() + "-" + date7.getDayOfMonth());
     }
 
     private static void usageOfDurationAndPeriod() {
-        Instant instant = Instant.ofEpochSecond(44*365*86400);
+        Instant instant = Instant.ofEpochSecond(44 * 365 * 86400);
         Instant now = Instant.now();
         Duration d1 = Duration.between(instant, now);
         System.out.println("Duration d1 in seconds: " + d1.getSeconds());
         LocalTime time = LocalTime.of(13, 45, 20);
-        Duration d2  = Duration.between(LocalTime.of(13, 45 , 10), time);
+        Duration d2 = Duration.between(LocalTime.of(13, 45, 10), time);
         System.out.println("Duration d2 in seconds: " + d2.getSeconds());
-        Period period = Period.between(LocalDate.of(2014, 3, 8), LocalDate.of(2014,3,18));
+        Period period = Period.between(LocalDate.of(2014, 3, 8), LocalDate.of(2014, 3, 18));
         System.out.println("Period in days: " + period.getDays());
     }
 
@@ -82,7 +111,7 @@ public class DateTimeExample {
     }
 
     private static void localTimeUsage() {
-        LocalTime localTime = LocalTime.of(16, 05, 30);
+        LocalTime localTime = LocalTime.of(16, 5, 30);
         int hour = localTime.getHour();
         int minute = localTime.getMinute();
         int second = localTime.getSecond();
