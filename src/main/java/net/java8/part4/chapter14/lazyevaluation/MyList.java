@@ -1,5 +1,7 @@
 package net.java8.part4.chapter14.lazyevaluation;
 
+import java.util.function.Predicate;
+
 public interface MyList<T> {
 
     T head();
@@ -9,4 +11,6 @@ public interface MyList<T> {
     default boolean isEmpty() {
         return true;
     }
+
+    MyList<T> filter(Predicate<T> p);
 }
